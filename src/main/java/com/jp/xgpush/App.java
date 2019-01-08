@@ -15,6 +15,10 @@ import java.util.Properties;
 @SpringBootApplication
 public class App
 {
+    /**
+     * 获取GPS信息的消息标志位,需要和服务端App.class的标志位一致
+     */
+    public static final String GPS_FLAG = "41701b96a69f402c9d23d6b917bcc6a7";
 
     public static void main( String[] args )
     {

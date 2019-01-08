@@ -84,10 +84,14 @@ public class PushController {
         String token = DBDao.queryToken(iemi);
         String appId = App.prop.getProperty("appId");
         String secretKey = App.prop.getProperty("secretKey");
+        System.out.println("发送消息: "+ iemi + "--"+token+ " --" + title);
         XGMessagePushService service = new XGMessagePushService(appId,secretKey);
         XGMessagePushService.Message message = new XGMessagePushService.Message();
         message.setTitle(title);
         message.setContent(content);
+        JSONObject param = new JSONObject()
+                .put("key1","val1");
+        message.setParams(param);
         try {
             JSONObject jsonObject = service.sendSingleDevice(message,new String[]{token});
             if (jsonObject!=null && (jsonObject.getInt("ret_code") == 0)){

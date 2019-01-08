@@ -1,6 +1,9 @@
 package com.jp.xgpush.service;
 
 import com.tencent.xinge.Style;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
@@ -38,9 +41,9 @@ public class XGMessagePushService {
         Message message = new Message();
         message.setTitle("来自服务端的消息");
         message.setContent("God is a girl "+new Date());
-        Map<String,String> params = new HashMap<>();
-        params.put("key","value");
-        message.setParams(params);
+        JSONObject param = new JSONObject()
+                .put("key1","val1");
+        message.setParams(param);
         try {
             JSONObject rs = push.sendSingleDevice(message,new String[]{"aceb0cc79e752a7a731b263e563170fc2d326d45"});
             System.out.println("发送结果为:"+rs);
@@ -96,6 +99,7 @@ public class XGMessagePushService {
                 entity = httpResponse.getEntity();
                 if( entity != null ){
                     result = EntityUtils.toString(entity);
+                    System.out.println(result);
                 }
             } catch (ClientProtocolException e) {
                 e.printStackTrace();
@@ -110,34 +114,13 @@ public class XGMessagePushService {
         return ret;
     }
 
+    @Getter
+    @Setter
+    @Accessors(chain = true)
     public static class Message {
         private String title;
         private String content;
-        private JSONObject m_params;
-
-        public String getTitle() {
-            return title;
-        }
-
-        public void setTitle(String title) {
-            this.title = title;
-        }
-
-        public String getContent() {
-            return content;
-        }
-
-        public void setContent(String content) {
-            this.content = content;
-        }
-
-        public JSONObject getParams() {
-            return m_params;
-        }
-
-        public void setParams(Map<String, String> params) {
-            this.m_params = new JSONObject(params);
-        }
+        private JSONObject params;
     }
 
     public String getAppId() {

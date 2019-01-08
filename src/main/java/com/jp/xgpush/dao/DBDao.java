@@ -1,5 +1,7 @@
 package com.jp.xgpush.dao;
 
+import com.jp.xgpush.entity.GPSInfoEntity;
+import com.jp.xgpush.entity.ResultEntity;
 import com.jp.xgpush.entity.TokenEntity;
 import com.jp.xgpush.entity.VersionInfo;
 import org.springframework.util.StringUtils;
@@ -12,15 +14,18 @@ import java.util.HashSet;
 public class DBDao {
     private static SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-    private static String driver = "org.apache.derby.jdbc.EmbeddedDriver";
-//    private static String driver = "org.apache.derby.jdbc.ClientDriver";
+    //嵌入式模式
+//    private static String driver = "org.apache.derby.jdbc.EmbeddedDriver";
+    //网络模式
+    private static String driver = "org.apache.derby.jdbc.ClientDriver";
     /**
      * 在工程目录下创建数据库
      */
-    private static String protocol = "jdbc:derby:C:/db_xg;create=true";
-    //    private static String protocol = "jdbc:derby://localhost:1527/db_xg;create=true";
+//    private static String protocol = "jdbc:derby:C:/db_xg;create=true";
+        private static String protocol = "jdbc:derby://localhost:1527/C:/db_xg;create=true";
     private static String tokenTableName = "T_TOKEN_LIST";
     private static String versionTableName = "T_VERSION_PROP";
+    private static String gpsTableName = "T_GPS_INFO";
 
     /**
      * 加载数据库驱动
@@ -81,6 +86,15 @@ public class DBDao {
                         " apkURL varchar(200)," +
                         " PROJECT VARCHAR(10)," +
                         " ADD_TIME timestamp" +
+                        ")");
+            }
+            if (!tableSet.contains(gpsTableName.toUpperCase())) {
+                stmt.executeUpdate(" create table " + gpsTableName +
+                        "(" +
+                        " iemi varchar(30)," +
+                        " time timestamp," +
+                        " latitude double," +
+                        " longitude double" +
                         ")");
             }
             return true;
@@ -188,6 +202,25 @@ public class DBDao {
                 statement.addBatch(sql);
                 statement.executeBatch();
             }
+            conn.commit();
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    /**
+     * 插入GPS信息
+     * @param gpsInfoEntity
+     * @return
+     */
+    public static boolean addGPSInfo(GPSInfoEntity gpsInfoEntity){
+        try (Connection conn = getDBConnection();
+             Statement statement = conn.createStatement()) {
+            String sql = "INSERT INTO APP.T_GPS_INFO (IEMI, TIME, LATITUDE, LONGITUDE) VALUES ('"+gpsInfoEntity.getIemi()+"', '"+format.format(new Date())+"', "+gpsInfoEntity.getLatitude()+", "+gpsInfoEntity.getLongtitude()+")";
+            statement.addBatch(sql);
+            statement.executeBatch();
             conn.commit();
             return true;
         } catch (Exception e) {
