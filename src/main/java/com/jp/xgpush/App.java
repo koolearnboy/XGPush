@@ -2,8 +2,16 @@ package com.jp.xgpush;
 
 import com.jp.xgpush.action.UpdateController;
 import com.jp.xgpush.dao.DBDao;
+import org.apache.catalina.Context;
+import org.apache.catalina.connector.Connector;
+import org.apache.tomcat.util.descriptor.web.SecurityCollection;
+import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
+import org.springframework.boot.web.servlet.server.ServletWebServerFactory;
+import org.springframework.context.annotation.Bean;
 
 import java.io.InputStream;
 import java.util.Properties;
@@ -45,5 +53,26 @@ public class App
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+
+    /**
+     * 新增一个连接器 将8080的http请求转发到8895端口的tomcat的https请求中
+     * @return
+     */
+    @Bean
+    public ServletWebServerFactory servletContainer() {
+        TomcatServletWebServerFactory tomcat = new TomcatServletWebServerFactory();
+        tomcat.addAdditionalTomcatConnectors(createStandardConnector());
+        return tomcat;
+    }
+
+    private Connector createStandardConnector() {
+        Connector connector = new Connector("org.apache.coyote.http11.Http11NioProtocol");
+        connector.setScheme("http");
+        connector.setPort(8080);
+        connector.setSecure(false);
+        connector.setRedirectPort(8895);
+        return connector;
     }
 }
